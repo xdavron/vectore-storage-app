@@ -5,8 +5,8 @@ import uvicorn
 app = FastAPI(title="Vector Storage App")
 
 # API routing
-app.include_router(ingest.router, prefix="/api/v1/ingest", tags=["Ingestion"])
-app.include_router(search.router, prefix="/api/v1/search", tags=["Search"])
+app.include_router(ingest.router, prefix="/api/v1", tags=["Ingestion"])
+app.include_router(search.router, prefix="/api/v1", tags=["Search"])
 
 
 @app.get("/")

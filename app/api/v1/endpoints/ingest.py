@@ -47,6 +47,8 @@ async def ingest_data(
             data = json.loads(contents)
             # Expecting the JSON file to contain at least a 'text' field and optionally 'metadata'
             metadata = data.pop("metadata", {})
+            if not metadata:
+                metadata = data
             text = json.dumps(data)
             if not text:
                 raise HTTPException(status_code=400, detail="JSON file must contain a 'text' field.")

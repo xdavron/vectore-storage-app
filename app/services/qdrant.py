@@ -11,8 +11,6 @@ DEFAULT_COLLECTION = settings.DEFAULT_COLLECTION
 # Qdrant client initialization
 qdrant_client = QdrantClient(host=settings.QDRANT_HOST, port=settings.QDRANT_PORT)
 
-# COLLECTION_NAME = "vector_data"
-
 
 def create_collection_if_not_exists(collection_name: str = DEFAULT_COLLECTION):
     """Check if the collection exists and create it if necessary."""
@@ -30,7 +28,7 @@ def create_collection_if_not_exists(collection_name: str = DEFAULT_COLLECTION):
 # Insert data into Qdrant
 def insert_into_qdrant(vector: list, metadata: dict, collection_name: str = DEFAULT_COLLECTION) -> str:
     # Ensure the collection exists
-    create_collection_if_not_exists()
+    create_collection_if_not_exists(collection_name)
 
     point_id = str(uuid.uuid4())
     #  Ideal for Individual or Small Batch Inserts

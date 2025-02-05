@@ -15,6 +15,10 @@ async def process_ingestion(context: VectorDBContext, text: str, metadata: dict)
     context.insert_data(text, metadata)
 
 
+async def process_bulk_ingestion(items: list, context: VectorDBContext):
+    context.insert_bulk_data(items)
+
+
 # Ingestion endpoint with database selection
 @router.post("/ingest", response_model=IngestResponse)
 async def ingest_data(
@@ -36,31 +40,54 @@ async def ingest_data(
 async def ingest_data(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(None),
+    collection_name: str = Query(None, description="Optional collection name; default is used if not provided."),
     db: str = Query("qdrant", enum=["qdrant", "chromadb"])  # Choose DB via query param
 ):
     # Check if an uploaded file is provided. If so, process file.
-    if file:
-        if file.content_type != "application/json":
-            raise HTTPException(status_code=400, detail="Only JSON files are supported.")
+    # if file:
+    #     if file.content_type != "application/json":
+    #         raise HTTPException(status_code=400, detail="Only JSON files are supported.")
+    #     try:
+    #         contents = await file.read()
+    #         data = json.loads(contents)
+    #         # Expecting the JSON file to contain at least a 'text' field and optionally 'metadata'
+    #         metadata = data.pop("metadata", {})
+    #         if not metadata:
+    #             metadata = data
+    #         text = json.dumps(data)
+    #         if not text:
+    #             raise HTTPException(status_code=400, detail="JSON file must contain a 'text' field.")
+    #     except Exception as e:
+    #         raise HTTPException(status_code=400, detail=f"Error processing file: {e}")
+    # else:
+    #     raise HTTPException(status_code=400, detail="No input provided. Provide JSON body or file upload.")
+    try:
+        contents = await file.read()
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error reading file: {e}")
+
+    # Try to parse as a JSON array first.
+    try:
+        items = json.loads(contents)
+        if not isinstance(items, list):
+            raise ValueError("JSON is not an array.")
+    except Exception:
+        # If not an array, treat as newline-delimited JSON.
+        items = []
         try:
-            contents = await file.read()
-            data = json.loads(contents)
-            # Expecting the JSON file to contain at least a 'text' field and optionally 'metadata'
-            metadata = data.pop("metadata", {})
-            if not metadata:
-                metadata = data
-            text = json.dumps(data)
-            if not text:
-                raise HTTPException(status_code=400, detail="JSON file must contain a 'text' field.")
+            for line in contents.decode().splitlines():
+                if line.strip():
+                    items.append(json.loads(line))
         except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Error processing file: {e}")
-    else:
-        raise HTTPException(status_code=400, detail="No input provided. Provide JSON body or file upload.")
+            raise HTTPException(status_code=400, detail=f"Error parsing JSON lines: {e}")
+
+        if not items:
+            raise HTTPException(status_code=400, detail="No valid items found in the file.")
 
     task_id = uuid.uuid4()
 
     # Dynamically set the strategy
     context = VectorDBContext(QdrantStrategy() if db == "qdrant" else ChromaDBStrategy())
-    background_tasks.add_task(process_ingestion, context, text, metadata)
+    background_tasks.add_task(process_bulk_ingestion, items, context)
 
-    return IngestResponse(task_id=task_id, status="Processing")
+    return IngestResponse(task_id=task_id, status="Bulk processing started")

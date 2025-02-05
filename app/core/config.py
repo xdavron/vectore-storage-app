@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     CHROMADB_HOST: str = "localhost"
     CHROMADB_PORT: int = 8000
     DEFAULT_DB: str = "qdrant"  # Options: 'qdrant' or 'chromadb'
+    DEFAULT_COLLECTION: str = "vector_data"
 
     class Config:
         env_file = ".env"

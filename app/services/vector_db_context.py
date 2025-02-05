@@ -15,3 +15,6 @@ class VectorDBContext:
 
     def search_data(self, query: str, top_k: int) -> list:
         return self.strategy.search_data(query, top_k)
+
+    def insert_bulk_data(self, items: list) -> None:
+        return self.strategy.insert_bulk_data(items)

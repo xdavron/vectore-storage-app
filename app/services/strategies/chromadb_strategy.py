@@ -8,6 +8,7 @@ from app.services.strategies.base import VectorDBStrategy
 class ChromaDBStrategy(VectorDBStrategy):
     def insert_data(self, text: str, metadata: dict, collection_name: str) -> str:
         return insert_into_chromadb(text, metadata, collection_name)
+
         # chat_id = metadata.get("chat_id", "default_chat")
         # # Construct a single-message list; we pass the role if provided.
         # message = {"content": text, "role": metadata.get("role", "unknown")}
@@ -17,6 +18,7 @@ class ChromaDBStrategy(VectorDBStrategy):
 
     def search_data(self, query: str, top_k: int, collection_name: str) -> list:
         return search_chromadb(query, top_k, collection_name)
+
         # return load_history_from_chroma(query, top_k, collection_name=collection_name)
         # return search_chromadb(query, top_k, collection_name=collection_name)
 
@@ -35,6 +37,7 @@ class ChromaDBStrategy(VectorDBStrategy):
         if not texts:
             raise ValueError("No valid items found for bulk insertion.")
         insert_into_chromadb_bulk(texts, payloads, collection_name)
+
         # for item in items:
         #     chat_id = item.get("chat_id", "default_chat")
         #     groups.setdefault(chat_id, []).append({

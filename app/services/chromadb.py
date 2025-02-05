@@ -112,10 +112,6 @@ def load_history_from_chroma(chat_id: str, top_k: int = 100, collection_name: st
 
 
 def insert_into_chromadb(text: str, metadata: dict, collection_name: str = DEFAULT_COLLECTION) -> str:
-    """
-    Insert a single document (text) into Chromadb with its associated metadata.
-    Returns a generated document ID.
-    """
     collection = create_or_get_collection(collection_name)
     doc_id = str(uuid.uuid4())
     try:
@@ -131,12 +127,7 @@ def insert_into_chromadb(text: str, metadata: dict, collection_name: str = DEFAU
 
 def insert_into_chromadb_bulk(texts: list, payloads: list, collection_name: str = DEFAULT_COLLECTION,
                               batch_size: int = 256):
-    """
-    Bulk insert a list of documents (texts) with corresponding metadata (payloads) into Chromadb.
-    The client automatically generates IDs.
-    """
     collection = create_or_get_collection(collection_name)
-    # (Chromadb's add method supports adding many documents at once.)
     try:
         collection.add(
             documents=texts,
@@ -148,10 +139,6 @@ def insert_into_chromadb_bulk(texts: list, payloads: list, collection_name: str 
 
 
 def search_chromadb(query: str, top_k: int, collection_name: str = DEFAULT_COLLECTION) -> list:
-    """
-    Search the collection for documents similar to the query text.
-    Returns a list of results, each containing an 'id', 'score', and 'metadata'.
-    """
     collection = create_or_get_collection(collection_name)
     try:
         results = collection.query(

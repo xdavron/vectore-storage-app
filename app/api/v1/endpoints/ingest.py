@@ -49,24 +49,6 @@ async def ingest_file(
     collection_name: str = Query(None, description="Optional collection name; default is used if not provided."),
     db: str = Query("qdrant", enum=["qdrant", "chromadb"])  # Choose DB via query param
 ):
-    # Check if an uploaded file is provided. If so, process file.
-    # if file:
-    #     if file.content_type != "application/json":
-    #         raise HTTPException(status_code=400, detail="Only JSON files are supported.")
-    #     try:
-    #         contents = await file.read()
-    #         data = json.loads(contents)
-    #         # Expecting the JSON file to contain at least a 'text' field and optionally 'metadata'
-    #         metadata = data.pop("metadata", {})
-    #         if not metadata:
-    #             metadata = data
-    #         text = json.dumps(data)
-    #         if not text:
-    #             raise HTTPException(status_code=400, detail="JSON file must contain a 'text' field.")
-    #     except Exception as e:
-    #         raise HTTPException(status_code=400, detail=f"Error processing file: {e}")
-    # else:
-    #     raise HTTPException(status_code=400, detail="No input provided. Provide JSON body or file upload.")
     try:
         contents = await file.read()
     except Exception as e:

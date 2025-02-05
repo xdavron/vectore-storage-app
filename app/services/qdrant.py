@@ -31,22 +31,11 @@ def insert_into_qdrant(vector: list, metadata: dict, collection_name: str = DEFA
     create_collection_if_not_exists(collection_name)
 
     point_id = str(uuid.uuid4())
-    #  Ideal for Individual or Small Batch Inserts
-    #  Insert or update a small number of points (even just one).
 
     qdrant_client.upsert(
         collection_name=collection_name,
         points=[PointStruct(id=point_id, vector=vector, payload=metadata)],
     )
-    # print(vector)
-    # payload = map(json.loads, metadata.get('data'))
-    # qdrant_client.upload_collection(
-    #     collection_name=COLLECTION_NAME,
-    #     vectors=[vector],
-    #     payload=metadata.get('data'),
-    #     ids=None,
-    #     batch_size=256
-    # )
     return point_id
 
 

@@ -7,6 +7,7 @@ import logging
 def generate_uuid() -> str:
     return str(uuid.uuid4())
 
+
 # Basic logger
 def get_logger(name: str):
     logger = logging.getLogger(name)

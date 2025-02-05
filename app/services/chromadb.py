@@ -98,17 +98,17 @@ def load_history_from_chroma(chat_id: str, top_k: int = 100, collection_name: st
 #     return [{"id": res, "metadata": md} for res, md in zip(results["ids"][0], results["metadatas"][0])]
 
 
-def insert_bulk_data(self, items: List[Dict]) -> None:
-    # For demonstration, iterate over items individually.
-    # In a real implementation, you might use a bulk API if available.
-    for idx, item in enumerate(items):
-        text = item.get("text")
-        if not text:
-            continue
-        metadata = item.get("metadata", {})
-        if not metadata:
-            metadata = {"source": f"line_{idx}"}
-        self.insert_data(text, metadata)
+# def insert_bulk_data(self, items: List[Dict]) -> None:
+#     # For demonstration, iterate over items individually.
+#     # In a real implementation, you might use a bulk API if available.
+#     for idx, item in enumerate(items):
+#         text = item.get("text")
+#         if not text:
+#             continue
+#         metadata = item.get("metadata", {})
+#         if not metadata:
+#             metadata = {"source": f"line_{idx}"}
+#         self.insert_data(text, metadata)
 
 
 def insert_into_chromadb(text: str, metadata: dict, collection_name: str = DEFAULT_COLLECTION) -> str:
@@ -165,12 +165,14 @@ def search_chromadb(query: str, top_k: int, collection_name: str = DEFAULT_COLLE
     res_list = []
     # Assuming results have keys: "ids", "documents", "metadatas", "distances"
     ids = results.get("ids", [[]])[0]
+    documents = results.get("documents", [[]])[0]
     distances = results.get("distances", [[]])[0]
     metadatas = results.get("metadatas", [[]])[0]
 
     for idx, _ in enumerate(ids):
         res_list.append({
             "id": ids[idx],
+            "documents": documents[idx],
             "score": distances[idx],
             "metadata": metadatas[idx]
         })
